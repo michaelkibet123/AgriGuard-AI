@@ -1,22 +1,30 @@
-# AgriGuard-AI: Intelligent Crop Protection & Emergency Response
+# 🌿 AgriGuard AI: Neural Crop Diagnostics
 
-AgriGuard-AI is a high-performance deep learning system designed to empower Kenyan farmers with real-time plant disease detection and a localized emergency response framework. 
-
-## 🚀 Key Features
-* **AI Diagnosis:** Leverages a custom-trained Convolutional Neural Network (CNN) to identify crop diseases from images.
-* **Kenyan Emergency Directory:** Integrated UI providing direct access to essential agricultural and emergency services across Kenya.
-* **Dynamic Alert System:** A visual "Red/Green" status interface for immediate risk assessment and action.
-
-## 🛠️ Technical Stack
-* **Core:** Python, TensorFlow, Keras
-* **UI/Interface:** Streamlit / Python-base
-* **Intelligence:** Custom `.h5` Deep Learning Model
-* **Development:** Google Colab & GitHub Version Control
-
-## 📁 Repository Structure
-* `app.py`: The main engine and UI Alert System.
-* `AgriGuard_Model_Training.ipynb`: The end-to-end research and model training process.
-* `AgriGuard_brain.h5`: The serialized weights of the trained AI model.
+An AI-powered diagnostic tool designed to identify diseases in Cassava crops using Deep Learning. This project bridges the gap between complex Computer Vision and real-world agricultural impact.
 
 ---
-*Developed by Michael Rotich as part of an ongoing commitment to tech-driven agricultural innovation.*
+
+## 🚀 Live Demo
+[Click here to view the Live App](YOUR_STREAMLIT_URL_HERE)
+
+## 🧠 The Tech Stack
+* **Core Engine:** TensorFlow 2.15.0
+* **Model Source:** Google CropNet (MobileNetV3 Architecture)
+* **Frontend:** Streamlit (Customized UI)
+* **Environment:** Python 3.10
+
+## 🛠️ Engineering Challenges (The "Version Hell" Solve)
+One of the primary achievements of this project was navigating complex environment dependencies:
+1. **Environment Stability:** Resolved `ModuleNotFoundError` by rolling back from Python 3.12 to **Python 3.10** to ensure compatibility with legacy TensorFlow-Hub dependencies.
+2. **Dependency Injection:** Manually injected `pkg_resources` via `setuptools` to bypass cloud-native deployment bugs.
+3. **Data Mapping:** Built a custom logic layer to translate raw Softmax tensors into human-readable treatment plans.
+
+## 🩺 Supported Diagnoses
+* Cassava Bacterial Blight (CBB)
+* Cassava Brown Streak Disease (CBSD)
+* Cassava Green Mottle (CGM)
+* Cassava Mosaic Disease (CMD)
+* Healthy Specimen Analysis
+
+---
+*Developed as a technical portfolio project for University-level Computer Science applications.*
