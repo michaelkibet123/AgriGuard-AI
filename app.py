@@ -5,8 +5,8 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-os.environ['KAGGLE_USERNAME'] = st.secrets["KAGGLE_USERNAME"]
-os.environ['KAGGLE_KEY'] = st.secrets["KAGGLE_KEY"]
+os.environ['roto4321p'] = st.secrets["roto4321p"]
+os.environ['KGAT_01365f0161e6cef31cb49670a00bd308'] = st.secrets["KGAT_01365f0161e6cef31cb49670a00bd308"]
 
 train_path = kagglehub.model_download("vbookshelf/rice-leaf-diseases-tf-model/tensorFlow2/default/1")
 path = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
