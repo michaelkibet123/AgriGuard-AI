@@ -45,7 +45,12 @@ if uploaded_file:
         img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         
-        predictions = model.predict(img_array)
+        # THE FIX: Send the image twice to satisfy the '2 inputs' error
+        try:
+            predictions = model.predict([img_array, img_array])
+        except:
+            predictions = model.predict(img_array)
+            
         idx = np.argmax(predictions)
         conf = np.max(predictions) * 100
 
