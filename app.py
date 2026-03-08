@@ -24,11 +24,15 @@ categories = [
     'Tomato Healthy'
 ]
 
-# --- 3. WAKE UP THE BRAIN (The Final Fix) ---
+# --- 3. WAKE UP THE BRAIN (Legacy Loader Fix) ---
 @st.cache_resource
 def load_model():
-    # Adding compile=False stops the "Input Tensors" error
-    return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
+    # We use 'compile=False' AND a specific loading check for older .h5 files
+    try:
+        return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
+    except Exception:
+        # If the standard loader fails, we use the legacy format
+        return tf.keras.layers.TFSMLayer('agri_guard_brain.h5', call_endpoint='serving_default')
 
 with st.spinner('Waking up the AI Intelligence...'):
     model = load_model()
