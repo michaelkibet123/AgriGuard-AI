@@ -5,6 +5,25 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from PIL import Image
 import numpy as np
+# --- SIDEBAR SETTINGS ---
+with st.sidebar:
+    st.header("🌿 AgriGuard Specs")
+    st.markdown("""
+    **Core Engine:** Google CropNet (MobileNetV3)
+    
+    **Architecture:**
+    * **Runtime:** Python 3.10 
+    * **Library:** TensorFlow 2.15
+    * **Cloud:** Streamlit Community
+    
+    ---
+    **System Status:** 🟢 Operational
+    
+    **Target Specimen:** *Cassava (Manihot esculenta)*
+    """)
+    
+    st.divider()
+    st.caption("Developed for high-impact agricultural diagnostics.")
 
 # Page Config
 st.set_page_config(page_title="AgriGuard AI", page_icon="🌿")
