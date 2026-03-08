@@ -5,7 +5,7 @@ An AI-powered diagnostic tool designed to identify diseases in Cassava crops usi
 ---
 
 ## 🚀 Live Demo
-[Click here to view the Live App](YOUR_STREAMLIT_URL_HERE)
+[Click here to view the Live App](https://agriguard-ai.streamlit.app)
 
 ## 🧠 The Tech Stack
 * **Core Engine:** TensorFlow 2.15.0
