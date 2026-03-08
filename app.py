@@ -94,6 +94,9 @@ history = model.fit(
 model.save('agri_guard_brain.h5')
 print("✅ SUCCESS: The AgriGuard Brain is saved as 'agri_guard_brain.h5'")
 
-from google.colab import files
-files.download('agri_guard_brain.h5')
-
+# PASTE THIS INSTEAD:
+if os.path.exists('agri_guard_brain.h5'):
+    with open("agri_guard_brain.h5", "rb") as f:
+        st.download_button("💾 Download Trained AgriGuard Brain", f, file_name="agri_guard_brain.h5")
+else:
+    st.info("🎓 AgriGuard is still in 'School' (Training). The download button will appear here once it graduates!")
