@@ -24,11 +24,11 @@ categories = [
     'Tomato Healthy'
 ]
 
-# --- 3. WAKE UP THE BRAIN (Version 2 Name) ---
+# --- 3. WAKE UP THE BRAIN (The Final Fix) ---
 @st.cache_resource
 def load_model():
-    # THIS MATCHES YOUR FILENAME EXACTLY:
-    return tf.keras.models.load_model('agri_guard_brain.h5')
+    # Adding compile=False stops the "Input Tensors" error
+    return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
 
 with st.spinner('Waking up the AI Intelligence...'):
     model = load_model()
