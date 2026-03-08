@@ -28,7 +28,7 @@ categories = [
 @st.cache_resource
 def load_model():
     # THIS MATCHES YOUR FILENAME EXACTLY:
-    return tf.keras.models.load_model('agri_guard_model_v2.h5')
+    return tf.keras.models.load_model('agri_guard_brain.h5')
 
 with st.spinner('Waking up the AI Intelligence...'):
     model = load_model()
