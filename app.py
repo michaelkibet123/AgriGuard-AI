@@ -11,10 +11,20 @@ else:
     st.error("❌ Secrets are missing or formatted incorrectly in Streamlit Settings!")
     st.stop()
 
-# 2. DOWNLOAD (Only starts if Step 1 is green)
-st.write("⏳ Connecting to Kaggle... (this can take a moment)")
-train_path = kagglehub.model_download("vbookshelf/rice-leaf-diseases-tf-model/tensorFlow2/default/1")
-path = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
+# PASTE THIS INSTEAD:
+st.write("⏳ Downloading 3GB Dataset... This will take 5-10 minutes.")
+try:
+    # We use dataset_download for BOTH to avoid the model path error
+    path1 = kagglehub.dataset_download("vbookshelf/rice-leaf-diseases")
+    path2 = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
+    
+    # We assign them to the variables your training code needs
+    train_path = path1 
+    path = path2
+    st.success("✅ All files downloaded and ready!")
+except Exception as e:
+    st.error(f"Kaggle Error: {e}")
+    st.stop()
 print("--------------------------------------------------")
 print("SUCCESS! The 3GB dataset is now on Google's server.")
 print("Folder Location:", path)
