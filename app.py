@@ -16,7 +16,7 @@ os.environ['KAGGLE_USERNAME'] = "roto4321p"
 os.environ['KAGGLE_KEY'] = "KGAT_f849c330cdcc2f68a4cf8b0b70eda83d"
 
 # 2. Install the tool that handles the data transfer
-!pip install kagglehub
+
 
 # 3. Pull the 3GB dataset directly to Google's cloud server
 import kagglehub
