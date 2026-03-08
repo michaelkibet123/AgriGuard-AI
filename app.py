@@ -10,9 +10,11 @@ st.title("🌿 AgriGuard AI: Smart Crop Doctor")
 # --- LOAD A GUARANTEED WORKING MODEL ---
 @st.cache_resource
 def load_standard_model():
-    # Using a high-performance crop model from TFHub
     model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
-    return hub.KerasLayer(model_url)
+    model = tf.keras.Sequential([
+        hub.KerasLayer(model_url)
+    ])
+    return model
 
 with st.spinner('Activating Agri-Intelligence...'):
     model = load_standard_model()
