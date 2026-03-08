@@ -3,12 +3,12 @@ import tensorflow as tf
 from PIL import Image
 import numpy as np
 
-# --- 1. UI SETUP (Premium Vibe) ---
+# --- 1. UI SETUP ---
 st.set_page_config(page_title="AgriGuard Pro", page_icon="🌿")
 st.title("🌿 AgriGuard AI: Smart Crop Doctor")
 st.markdown("### High-Precision Plant Disease Detection")
 
-# --- 2. THE DICTIONARY (38 Classes) ---
+# --- 2. THE DICTIONARY ---
 categories = [
     'Apple Scab', 'Apple Black Rot', 'Apple Cedar Rust', 'Apple Healthy',
     'Blueberry Healthy', 'Cherry Powdery Mildew', 'Cherry Healthy',
@@ -24,14 +24,11 @@ categories = [
     'Tomato Healthy'
 ]
 
-# --- 3. WAKE UP THE BRAIN (Legacy Loader Fix) ---
+# --- 3. WAKE UP THE BRAIN ---
 @st.cache_resource
 def load_model():
-    try:
-        return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
-    except Exception:
-        # If the standard loader fails, we use the legacy format
-        return tf.keras.layers.TFSMLayer('agri_guard_brain.h5', call_endpoint='serving_default')
+    # Standard loader with compile=False is the safest for TF 2.15
+    return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
 
 with st.spinner('Waking up the AI Intelligence...'):
     model = load_model()
@@ -48,20 +45,13 @@ if uploaded_file:
         img_array = np.array(img).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         
-        # --- THE HARD FIX FOR TFSMLayer (Dual Input) ---
+        # Handling the "2 Input Tensors" logic without TFSMLayer
         try:
-            # We call the model directly and send the image twice
-            preds = model([img_array, img_array], training=False)
-            
-            # Handle dictionary output from TFSMLayer
-            if isinstance(preds, dict):
-                preds = list(preds.values())[0]
-            
-            predictions = np.array(preds)
+            # If the model has 2 input layers, this satisfies it
+            predictions = model.predict([img_array, img_array])
         except Exception:
-            # Fallback for single input models
-            preds = model(img_array, training=False)
-            predictions = np.array(preds)
+            # Standard single input
+            predictions = model.predict(img_array)
 
         idx = np.argmax(predictions)
         conf = np.max(predictions) * 100
