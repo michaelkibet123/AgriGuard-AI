@@ -35,26 +35,26 @@ def load_model():
         return tf.keras.layers.TFSMLayer('agri_guard_brain.h5', call_endpoint='serving_default')
 
 with st.spinner('Waking up the AI Intelligence...'):
-    model = load_model()
-
-# --- 4. THE INTERFACE ---
-uploaded_file = st.file_uploader("📸 Scan a leaf photo...", type=["jpg", "png", "jpeg"])
-
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Target Leaf", use_container_width=True)
-    
-    with st.spinner('Analyzing cellular patterns...'):
+with st.spinner('Analyzing cellular patterns...'):
         img = image.resize((224, 224))
-        img_array = np.array(img) / 255.0
+        img_array = np.array(img).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         
-        # THE FIX: Send the image twice to satisfy the '2 inputs' error
+        # --- THE HARD FIX FOR TFSMLayer ---
         try:
-            predictions = model.predict([img_array, img_array])
-        except:
-            predictions = model.predict(img_array)
+            # We call the model directly and send the image twice
+            preds = model([img_array, img_array], training=False)
             
+            # If the brain returns a dictionary, we grab the first item
+            if isinstance(preds, dict):
+                preds = list(preds.values())[0]
+            
+            predictions = np.array(preds)
+        except Exception:
+            # Fallback for single input
+            preds = model(img_array, training=False)
+            predictions = np.array(preds)
+
         idx = np.argmax(predictions)
         conf = np.max(predictions) * 100
 
