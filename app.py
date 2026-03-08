@@ -2,6 +2,7 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image
 import numpy as np
+import keras
 
 # --- 1. UI SETUP ---
 st.set_page_config(page_title="AgriGuard Pro", page_icon="🌿")
@@ -24,11 +25,11 @@ categories = [
     'Tomato Healthy'
 ]
 
-# --- 3. WAKE UP THE BRAIN ---
+# --- 3. THE "BYPASS" LOADER ---
 @st.cache_resource
 def load_model():
-    # Standard loader with compile=False is the safest for TF 2.15
-    return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
+    # This specific line bypasses the 'batch_shape' error by using the Legacy loader
+    return tf.keras.models.load_model('agri_guard_brain.h5', compile=False, safe_mode=False)
 
 with st.spinner('Waking up the AI Intelligence...'):
     model = load_model()
@@ -45,12 +46,10 @@ if uploaded_file:
         img_array = np.array(img).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         
-        # Handling the "2 Input Tensors" logic without TFSMLayer
+        # Final double-input safety check
         try:
-            # If the model has 2 input layers, this satisfies it
             predictions = model.predict([img_array, img_array])
         except Exception:
-            # Standard single input
             predictions = model.predict(img_array)
 
         idx = np.argmax(predictions)
