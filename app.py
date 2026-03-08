@@ -20,6 +20,7 @@ os.environ['KAGGLE_KEY'] = "KGAT_f849c330cdcc2f68a4cf8b0b70eda83d"
 
 # 3. Pull the 3GB dataset directly to Google's cloud server
 import kagglehub
+train_path = kagglehub.model_download("sallu7/rice-leaf-disease-classification/tensorFlow2/rice-leaf-disease-model")
 path = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
 
 print("--------------------------------------------------")
