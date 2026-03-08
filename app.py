@@ -1,102 +1,54 @@
-import os
 import streamlit as st
-import kagglehub
-
-# 1. IMMEDIATE SETUP
-if "KAGGLE_USERNAME" in st.secrets and "KAGGLE_KEY" in st.secrets:
-    os.environ['KAGGLE_USERNAME'] = st.secrets["KAGGLE_USERNAME"]
-    os.environ['KAGGLE_KEY'] = st.secrets["KAGGLE_KEY"]
-    st.write("✅ Kaggle Credentials Found")
-else:
-    st.error("❌ Secrets are missing or formatted incorrectly in Streamlit Settings!")
-    st.stop()
-
-# PASTE THIS INSTEAD:
-st.write("⏳ Downloading 3GB Dataset... This will take 5-10 minutes.")
-try:
-    # We use dataset_download for BOTH to avoid the model path error
-    path1 = kagglehub.dataset_download("vbookshelf/rice-leaf-diseases")
-    path2 = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
-    
-    # We assign them to the variables your training code needs
-    train_path = path1 
-    path = path2
-    st.success("✅ All files downloaded and ready!")
-except Exception as e:
-    st.error(f"Kaggle Error: {e}")
-    st.stop()
-print("--------------------------------------------------")
-print("SUCCESS! The 3GB dataset is now on Google's server.")
-print("Folder Location:", path)
-
-
-
 import tensorflow as tf
-from tensorflow.keras import layers, models
+from PIL import Image
+import numpy as np
 
-# 1. We create the 'Base' using Google's MobileNetV2
-# It's like a student who already knows how to see shapes/colors
-base_model = tf.keras.applications.MobileNetV2(
-    input_shape=(224, 224, 3),
-    include_top=False,
-    weights='imagenet'
-)
+# --- 1. UI SETUP (Premium Vibe) ---
+st.set_page_config(page_title="AgriGuard Pro", page_icon="🌿")
+st.title("🌿 AgriGuard AI: Smart Crop Doctor")
+st.markdown("### High-Precision Plant Disease Detection")
 
-# 2. We 'freeze' the base so it doesn't forget the basics
-base_model.trainable = False
+# --- 2. THE DICTIONARY (38 Classes) ---
+categories = [
+    'Apple Scab', 'Apple Black Rot', 'Apple Cedar Rust', 'Apple Healthy',
+    'Blueberry Healthy', 'Cherry Powdery Mildew', 'Cherry Healthy',
+    'Corn Gray Leaf Spot', 'Corn Common Rust', 'Corn Northern Blight', 'Corn Healthy', 
+    'Grape Black Rot', 'Grape Black Measles', 'Grape Leaf Blight', 'Grape Healthy', 
+    'Orange Citrus Greening', 'Peach Bacterial Spot', 'Peach Healthy', 
+    'Pepper Bell Bacterial Spot', 'Pepper Bell Healthy', 'Potato Early Blight', 
+    'Potato Late Blight', 'Potato Healthy', 'Raspberry Healthy', 'Soybean Healthy', 
+    'Squash Powdery Mildew', 'Strawberry Leaf Scorch', 'Strawberry Healthy', 
+    'Tomato Bacterial Spot', 'Tomato Early Blight', 'Tomato Late Blight', 
+    'Tomato Leaf Mold', 'Tomato Septoria Leaf Spot', 'Tomato Spider Mites', 
+    'Tomato Target Spot', 'Tomato Yellow Leaf Curl Virus', 'Tomato Mosaic Virus', 
+    'Tomato Healthy'
+]
 
-# 3. We add the 'AgriGuard' specialized layer on top
-model = models.Sequential([
-    base_model,
-    layers.GlobalAveragePooling2D(),
-    layers.Dense(128, activation='relu'),
-    layers.Dropout(0.2), # Helps prevent the AI from 'cheating' by memorizing
-    layers.Dense(38, activation='softmax') # 38 is the number of plant diseases we are tracking
-])
+# --- 3. WAKE UP THE BRAIN (Version 2 Name) ---
+@st.cache_resource
+def load_model():
+    # THIS MATCHES YOUR FILENAME EXACTLY:
+    return tf.keras.models.load_model('agri_guard_brain (1).h5')
 
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+with st.spinner('Waking up the AI Intelligence...'):
+    model = load_model()
 
-print("--------------------------------------------------")
-print("BRAIN INITIALIZED: AgriGuard is ready for school.")
-model.summary()
+# --- 4. THE INTERFACE ---
+uploaded_file = st.file_uploader("📸 Scan a leaf photo...", type=["jpg", "png", "jpeg"])
 
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+if uploaded_file:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Target Leaf", use_container_width=True)
+    
+    with st.spinner('Analyzing cellular patterns...'):
+        img = image.resize((224, 224))
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        
+        predictions = model.predict(img_array)
+        idx = np.argmax(predictions)
+        conf = np.max(predictions) * 100
 
-# 1. Prepare the 'Feeding Tube' for the AI
-# We shrink the photos to 224x224 so the GPU can process them faster
-datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
-
-train_generator = datagen.flow_from_directory(
-    train_path,
-    target_size=(224, 224),
-    batch_size=32,
-    class_mode='sparse',
-    subset='training'
-)
-
-val_generator = datagen.flow_from_directory(
-    train_path,
-    target_size=(224, 224),
-    batch_size=32,
-    class_mode='sparse',
-    subset='validation'
-)
-
-# 2. START THE TRAINING (The 'Fit' Phase)
-# We start with 5 'Epochs' (5 full rounds of study)
-history = model.fit(
-    train_generator,
-    validation_data=val_generator,
-    epochs=5
-)
-
-# Save the model so we can use it in our UI
-model.save('agri_guard_brain.h5')
-print("✅ SUCCESS: The AgriGuard Brain is saved as 'agri_guard_brain.h5'")
-
-# PASTE THIS INSTEAD:
-if os.path.exists('agri_guard_brain.h5'):
-    with open("agri_guard_brain.h5", "rb") as f:
-        st.download_button("💾 Download Trained AgriGuard Brain", f, file_name="agri_guard_brain.h5")
-else:
-    st.info("🎓 AgriGuard is still in 'School' (Training). The download button will appear here once it graduates!")
+    # --- 5. THE REVEAL ---
+    st.success(f"**Diagnosis:** {categories[idx]}")
+    st.info(f"**AI Confidence:** {conf:.1f}%")
