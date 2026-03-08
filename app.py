@@ -1,17 +1,20 @@
 import os
 import streamlit as st
 import kagglehub
-import tensorflow as tf
-from tensorflow.keras import layers, models
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-os.environ['KAGGLE_USERNAME'] = st.secrets["KAGGLE_USERNAME"]
-os.environ['KAGGLE_KEY'] = st.secrets["KAGGLE_KEY"]
+# 1. IMMEDIATE SETUP
+if "KAGGLE_USERNAME" in st.secrets and "KAGGLE_KEY" in st.secrets:
+    os.environ['KAGGLE_USERNAME'] = st.secrets["KAGGLE_USERNAME"]
+    os.environ['KAGGLE_KEY'] = st.secrets["KAGGLE_KEY"]
+    st.write("✅ Kaggle Credentials Found")
+else:
+    st.error("❌ Secrets are missing or formatted incorrectly in Streamlit Settings!")
+    st.stop()
 
+# 2. DOWNLOAD (Only starts if Step 1 is green)
+st.write("⏳ Connecting to Kaggle... (this can take a moment)")
 train_path = kagglehub.model_download("vbookshelf/rice-leaf-diseases-tf-model/tensorFlow2/default/1")
 path = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
-path = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
-
 print("--------------------------------------------------")
 print("SUCCESS! The 3GB dataset is now on Google's server.")
 print("Folder Location:", path)
