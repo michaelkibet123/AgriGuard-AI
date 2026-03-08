@@ -27,7 +27,6 @@ categories = [
 # --- 3. WAKE UP THE BRAIN (Legacy Loader Fix) ---
 @st.cache_resource
 def load_model():
-    # We use 'compile=False' AND a specific loading check for older .h5 files
     try:
         return tf.keras.models.load_model('agri_guard_brain.h5', compile=False)
     except Exception:
@@ -35,23 +34,32 @@ def load_model():
         return tf.keras.layers.TFSMLayer('agri_guard_brain.h5', call_endpoint='serving_default')
 
 with st.spinner('Waking up the AI Intelligence...'):
-with st.spinner('Analyzing cellular patterns...'):
+    model = load_model()
+
+# --- 4. THE INTERFACE ---
+uploaded_file = st.file_uploader("📸 Scan a leaf photo...", type=["jpg", "png", "jpeg"])
+
+if uploaded_file:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Target Leaf", use_container_width=True)
+    
+    with st.spinner('Analyzing cellular patterns...'):
         img = image.resize((224, 224))
         img_array = np.array(img).astype(np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         
-        # --- THE HARD FIX FOR TFSMLayer ---
+        # --- THE HARD FIX FOR TFSMLayer (Dual Input) ---
         try:
             # We call the model directly and send the image twice
             preds = model([img_array, img_array], training=False)
             
-            # If the brain returns a dictionary, we grab the first item
+            # Handle dictionary output from TFSMLayer
             if isinstance(preds, dict):
                 preds = list(preds.values())[0]
             
             predictions = np.array(preds)
         except Exception:
-            # Fallback for single input
+            # Fallback for single input models
             preds = model(img_array, training=False)
             predictions = np.array(preds)
 
