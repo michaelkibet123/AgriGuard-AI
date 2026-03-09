@@ -173,6 +173,7 @@ prediction_label = labels[result_index]
                 
                 st.markdown("---")
                 # This button ONLY appears if the plant is sick
+o
                 if st.button("🔍 Compile Live Treatment Research"):
                     with st.spinner(f"Architect is browsing 2026 data for {prediction_label}..."):
                         research_data = compile_results(prediction_label)
