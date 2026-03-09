@@ -4,9 +4,13 @@ import streamlit as st
 import tensorflow as tf
 import tensorflow_hub as hub
 from PIL import Image
-import numpy as np
+import numpy as 
 import requests
 from bs4 import BeautifulSoup
+import requests
+from bs4 import BeautifulSoup
+
+# --- 2. INTELLIGENCE LAYER (The Brain) ---
 
 def compile_results(disease):
     search_url = f"https://www.google.com/search?q={disease}+treatment+measures+kenya+2026"
@@ -127,13 +131,19 @@ with tab1:
                 predictions = model(img_array)
                 result_index = np.argmax(predictions)
                 
-                labels = [
-                    "Bacterial Blight (CBB)", 
-                    "Brown Streak Disease (CBSD)", 
-                    "Green Mottle (CGM)", 
-                    "Mosaic Disease (CMD)", 
-                    "Healthy Specimen"
-                ]
+                # --- 4. UNIVERSAL CROP LIBRARY ---
+                crop_library = {
+                    "Cassava": ["Bacterial Blight (CBB)", "Brown Streak (CBSD)", "Green Mottle (CGM)", "Mosaic Disease (CMD)", "Healthy Cassava"],
+                    "Maize": ["Common Rust", "Gray Leaf Spot", "Northern Leaf Blight", "Healthy Maize"],
+                    "Potato": ["Early Blight", "Late Blight", "Healthy Potato"],
+                    "Tomato": ["Bacterial Spot", "Early Blight", "Late Blight", "Leaf Mold", "Healthy Tomato"]
+                }
+
+                # Dynamic Selection for the Farmer
+                selected_crop = st.selectbox("Select Crop Type", list(crop_library.keys()))
+                
+                # The 'Switchboard' logic:
+                labels = crop_library[selected_crop]
                 prediction_label = labels[result_index]
 
             # Result Display
@@ -144,7 +154,7 @@ with tab1:
                 st.success("Verification: No pathogen markers detected.")
             else:
                 st.error(f"Alert: {prediction_label} identified.")
-                st.markdown("**Action Plan:**")
+                st.markdown("**Action Plan**")
                 st.write("1. Check for whitefly presence in immediate crop radius.")
                 st.write("2. Apply localized copper-based bactericide if applicable.")
                 st.markdown("---")
