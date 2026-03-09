@@ -5,6 +5,19 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from PIL import Image
 import numpy as np
+import requests
+from bs4 import BeautifulSoup
+
+def compile_results(disease):
+    search_url = f"https://www.google.com/search?q={disease}+treatment+measures+kenya+2026"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        response = requests.get(search_url, headers=headers, timeout=5)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        results = soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
+        return results[0].text if results else "No live research found."
+    except:
+        return "Offline: Research servers unreachable."
 
 # --- 1. PAGE CONFIG & THEME ---
 st.set_page_config(
@@ -134,6 +147,13 @@ with tab1:
                 st.markdown("**Action Plan:**")
                 st.write("1. Check for whitefly presence in immediate crop radius.")
                 st.write("2. Apply localized copper-based bactericide if applicable.")
+                st.markdown("---")
+                if st.button("🔍 Compile Live Treatment Research"):
+                    with st.spinner(f"Architect is browsing for {prediction_label} data..."):
+                        compiled_data = compile_results(prediction_label)
+                        st.subheader("📋 Compiled Research Summary")
+                        st.info(compiled_data)
+                        st.caption("Data aggregated from live Google Search results (Kenya 2026).")
 
 with tab2:
     st.subheader("Field Directory")
