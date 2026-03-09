@@ -158,7 +158,7 @@ prediction_label = labels[result_index]
                 labels = crop_library[selected_crop]
                 prediction_label = labels[result_index]
 
-            # Result Display
+            # Result Display 
             st.metric(label="Primary Diagnosis", value=prediction_label)
             # --- 5. SMART DIAGNOSTIC INTERFACE --- 
             st.markdown("---")
