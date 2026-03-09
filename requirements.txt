@@ -4,3 +4,5 @@ tensorflow-hub==0.16.1
 setuptools==69.5.1
 pillow
 numpy
+requests
+beautifulsoup4
