@@ -160,7 +160,7 @@ prediction_label = labels[result_index]
 
             # Result Display
             st.metric(label="Primary Diagnosis", value=prediction_label)
-            # --- 5. SMART DIAGNOSTIC INTERFACE ---
+            # --- 5. SMART DIAGNOSTIC INTERFACE --- 
             st.markdown("---")
             if "Healthy" in prediction_label:
                 st.balloons()
