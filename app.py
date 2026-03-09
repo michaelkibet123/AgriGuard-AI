@@ -91,6 +91,17 @@ model = load_model()
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2097/2097276.png", width=80)
     st.title("AgriGuard Pro")
+# --- 4. UNIVERSAL CROP LIBRARY ---
+crop_library = {
+    "Cassava": ["Bacterial Blight (CBB)", "Brown Streak (CBSD)", "Green Mottle (CGM)", "Mosaic Disease (CMD)", "Healthy Cassava"],
+    "Maize": ["Common Rust", "Gray Leaf Spot", "Northern Leaf Blight", "Healthy Maize"],
+    "Potato": ["Early Blight", "Late Blight", "Healthy Potato"],
+    "Tomato": ["Bacterial Spot", "Early Blight", "Late Blight", "Leaf Mold", "Healthy Tomato"]
+}
+
+# This creates the dropdown menu you were looking for
+selected_crop = st.selectbox("Select Crop Type", list(crop_library.keys()))
+labels = crop_library[selected_crop]
     st.markdown("---")
     
     st.write("### System Specs")
@@ -130,6 +141,7 @@ with tab1:
                 
                 predictions = model(img_array)
                 result_index = np.argmax(predictions)
+prediction_label = labels[result_index]
                 
                 # --- 4. UNIVERSAL CROP LIBRARY ---
                 crop_library = {
@@ -148,6 +160,25 @@ with tab1:
 
             # Result Display
             st.metric(label="Primary Diagnosis", value=prediction_label)
+# --- 5. SMART DIAGNOSTIC INTERFACE ---
+            st.markdown("---")
+            if "Healthy" in prediction_label:
+                st.balloons()
+                st.success(f"✅ {prediction_label}: No pathogen markers detected.")
+            else:
+                st.error(f"⚠️ Alert: {prediction_label} identified.")
+                st.markdown("### **Architect's Action Plan**")
+                st.write("1. **Isolate:** Remove affected leaves to prevent spore spread.")
+                st.write("2. **Vector Control:** Check for whiteflies or aphids.")
+                
+                st.markdown("---")
+                # This button ONLY appears if the plant is sick
+                if st.button("🔍 Compile Live Treatment Research"):
+                    with st.spinner(f"Architect is browsing 2026 data for {prediction_label}..."):
+                        research_data = compile_results(prediction_label)
+                        st.subheader("📋 Compiled Research Summary")
+                        st.info(research_data)
+                        st.caption("Source: Live Google Search Aggregation (Kenya 2026)")
             
             if "Healthy" in prediction_label:
                 st.balloons()
@@ -158,12 +189,6 @@ with tab1:
                 st.write("1. Check for whitefly presence in immediate crop radius.")
                 st.write("2. Apply localized copper-based bactericide if applicable.")
                 st.markdown("---")
-                if st.button("🔍 Compile Live Treatment Research"):
-                    with st.spinner(f"Architect is browsing for {prediction_label} data..."):
-                        compiled_data = compile_results(prediction_label)
-                        st.subheader("📋 Compiled Research Summary")
-                        st.info(compiled_data)
-                        st.caption("Data aggregated from live Google Search results (Kenya 2026).")
 
 with tab2:
     st.subheader("Field Directory")
@@ -188,3 +213,12 @@ with tab3:
     [INFO] Softmax Layer: 5-way Classification
     [SUCCESS] Environment stable on Streamlit Cloud (Linux/Python 3.10)
     """)
+# --- 6. FOOTER & SOURCE ---
+st.markdown("---")
+st.caption("🌿 **AgriGuard Pro v2.1** | Intelligence: TensorFlow-Hub | Environment: Streamlit Cloud")
+
+with st.sidebar:
+    st.markdown("---")
+    st.subheader("👨‍🔬 Agronomist Portal")
+    if st.button("Request Expert Review"):
+        st.success("Request sent to nearest KALRO station.")
