@@ -155,7 +155,7 @@ prediction_label = labels[result_index]
 
             # Result Display 
             st.metric(label="Primary Diagnosis", value=prediction_label)
-st.markdown("---")
+            st.markdown("---")
             if "Healthy" in prediction_label:
                 st.balloons()
                 st.success(f"✅ {prediction_label}: No pathogen markers detected.")
@@ -167,7 +167,6 @@ st.markdown("---")
                 
                 st.markdown("---")
                 # This button ONLY appears if the plant is sick
-o
                 if st.button("🔍 Compile Live Treatment Research"):
                     with st.spinner(f"Architect is browsing 2026 data for {prediction_label}..."):
                         research_data = compile_results(prediction_label)
