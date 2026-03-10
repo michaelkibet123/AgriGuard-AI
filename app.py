@@ -144,9 +144,6 @@ with tab1:
 prediction_label = labels[result_index]
                 
                 # --- 4. UNIVERSAL CROP LIBRARY ---
-                crop_library = {
-                    "Cassava": ["Bacterial Blight (CBB)", "Brown Streak (CBSD)", "Green Mottle (CGM)", "Mosaic Disease (CMD)", "Healthy Cassava"],
-                    "Maize": ["Common Rust", "Gray Leaf Spot", "Northern Leaf Blight", "Healthy Maize"],
                     "Potato": ["Early Blight", "Late Blight", "Healthy Potato"],
                     "Tomato": ["Bacterial Spot", "Early Blight", "Late Blight", "Leaf Mold", "Healthy Tomato"]
                 }
@@ -160,7 +157,6 @@ prediction_label = labels[result_index]
 
             # Result Display 
             st.metric(label="Primary Diagnosis", value=prediction_label)
-            # --- 5. SMART DIAGNOSTIC INTERFACE --- 
             st.markdown("---")
             if "Healthy" in prediction_label:
                 st.balloons()
@@ -179,7 +175,6 @@ o
                         research_data = compile_results(prediction_label)
                         st.subheader("📋 Compiled Research Summary")
                         st.info(research_data)
-                        st.caption("Source: Live Google Search Aggregation (Kenya 2026)")
             
             if "Healthy" in prediction_label:
                 st.balloons()
