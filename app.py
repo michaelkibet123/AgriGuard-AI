@@ -155,7 +155,7 @@ prediction_label = labels[result_index]
 
             # Result Display 
             st.metric(label="Primary Diagnosis", value=prediction_label)
-            st.markdown("---")
+st.markdown("---")
             if "Healthy" in prediction_label:
                 st.balloons()
                 st.success(f"✅ {prediction_label}: No pathogen markers detected.")
