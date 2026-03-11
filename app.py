@@ -246,8 +246,27 @@ st.caption(
     "🌿 **AgriGuard Pro v2.1** | Intelligence: TensorFlow-Hub | Environment: Streamlit Cloud"
 )
 
+
+import streamlit as st
+import tensorflow as tf
+import numpy as np
+from PIL import Image
+
+# 1. Global labels - KEEP THIS AT THE TOP
+labels = [
+    'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
+    'Corn___Gray_leaf_spot', 'Corn___Common_rust', 'Corn___Northern_Leaf_Blight', 'Corn___healthy',
+    'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___Late_blight', 'Tomato___healthy'
+]
+
+# 2. The Sidebar Block (Everything indented here stays on the left)
 with st.sidebar:
+    st.title("👨‍🔬 Agronomist Portal")
     st.markdown("---")
-    st.subheader("👨‍🔬 Agronomist Portal")
     if st.button("Request Expert Review"):
         st.success("Request sent to nearest KALRO station.")
+    st.info("AgriGuard v1.0 | Kenya")
+
+# 3. The Main Page (Everything NOT indented stays in the middle)
+st.title("🌿 AgriGuard: AI Leaf Diagnosis")
+# ... your image uploader code follows here
