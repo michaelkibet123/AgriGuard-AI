@@ -138,21 +138,21 @@ if uploaded_file is not None:
         st.write("📡 Cross-referencing crop library...")
         status.update(label="Analysis Complete!", state="complete", expanded=False)
 
-    # --- 7. RESULTS DASHBOARD ---
+# --- 7. RESULTS DASHBOARD (Fixed Indentation) ---
     st.markdown("---")
     res_col1, res_col2, res_col3 = st.columns(3)
-    
-    with res_col1:
-        st.metric(label="Status", value="Pathogen Detected", delta="- Critical", delta_color="inverse")
-    
-    with res_col2:
-        # This pulls the first disease from your library as a placeholder
-        st.metric(label="Diagnosis", value=crop_library[selected_crop][0])
-        
-    with res_col3:
-        st.metric(label="Confidence", value="94.2%")
 
-    st.warning(f"**Action Required:** Apply recommended treatment for {crop_library[selected_crop][0]}.")
+    with res_col1:
+        st.metric(label="Status", value="Analysis Active", delta="Live")
+
+    with res_col2:
+        # We use a generic label until the AI model is linked
+        st.metric(label="Diagnosis", value="Pending...")
+
+    with res_col3:
+        st.metric(label="Confidence", value="-- %")
+
+    st.info("System is waiting for neural engine to confirm classification.")
 # This creates the dropdown menu you were looking for
 selected_crop = st.selectbox("Select Crop Type", list(crop_library.keys()))
 labels = crop_library[selected_crop]
@@ -160,8 +160,7 @@ st.markdown("---")
 
 st.write("### System Specs")
 st.caption("Core: Google CropNet")
-st.caption("Engine: MobileNetV3")
-st.caption("Environment: Python 3.10")
+st.caption("Engine: MobileNetV3")st.caption("Environment: Python 3.10")
 
 st.markdown("---")
 st.write("### Diagnostics")
