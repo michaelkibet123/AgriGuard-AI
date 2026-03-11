@@ -8,6 +8,11 @@ from bs4 import BeautifulSoup
 import requests
 from bs4 import BeautifulSoup
 
+# --- INITIALIZE VARIABLES (Fixes the NameError) ---
+prediction_label = "Waiting for Image..."
+confidence_score = 0.0
+recommendation_text = "Please upload a leaf image to begin analysis."
+
 # --- 2. INTELLIGENCE LAYER (The Brain) ---
 
 
@@ -155,21 +160,16 @@ if uploaded_file is not None:
         st.write("📡 Cross-referencing crop library...")
         status.update(label="Analysis Complete!", state="complete", expanded=False)
 
-    # --- 7. RESULTS DASHBOARD (Fixed Indentation) ---
-    st.markdown("---")
-    res_col1, res_col2, res_col3 = st.columns(3)
+# --- 7. RESULTS DASHBOARD ---
+st.markdown("---")
+res_col1, res_col2 = st.columns(2)
 
-    with res_col1:
-        st.metric(label="Status", value="Analysis Active", delta="Live")
+with res_col1:
+    # This matches the variable we initialized at the top
+    st.metric(label="Primary Diagnosis", value=prediction_label)
 
-    with res_col2:
-        # We use a generic label until the AI model is linked
-        st.metric(label="Diagnosis", value="Pending...")
-
-    with res_col3:
-        st.metric(label="Confidence", value="-- %")
-
-    st.info("System is waiting for neural engine to confirm classification.")
+with res_col2:
+    st.metric(label="Confidence", value=f"{confidence_score}%")
 # This creates the dropdown menu you were looking for
 selected_crop = st.selectbox("Select Crop Type", list(crop_library.keys()))
 labels = crop_library[selected_crop]
@@ -331,3 +331,6 @@ with st.sidebar:
 # 3. The Main Page (Everything NOT indented stays in the middle)
 st.title("🌿 AgriGuard: AI Leaf Diagnosis")
 # ... your image uploader code follows here
+
+# --- 8. RECOMMENDATION ---
+st.info(f"💡 **Recommendation:** {recommendation_text}")
