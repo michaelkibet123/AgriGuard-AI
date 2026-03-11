@@ -3,6 +3,6 @@ tensorflow-cpu==2.15.0
 tensorflow-hub==0.16.1
 pillow
 numpy<2.0.0
-setuptools
+setuptools==58.2.0
 wheel
 protobuf==4.25.3
