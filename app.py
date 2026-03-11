@@ -160,7 +160,8 @@ st.markdown("---")
 
 st.write("### System Specs")
 st.caption("Core: Google CropNet")
-st.caption("Engine: MobileNetV3")st.caption("Environment: Python 3.10")
+st.caption("Engine: MobileNetV3")
+st.caption("Environment: Python 3.10")
 
 st.markdown("---")
 st.write("### Diagnostics")
