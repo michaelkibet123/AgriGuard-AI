@@ -3,3 +3,5 @@ tensorflow-hub
 streamlit
 pillow
 numpy
+setuptools
+opencv-python-headless
