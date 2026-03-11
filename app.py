@@ -99,19 +99,30 @@ with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2097/2097276.png", width=80)
     st.title("AgriGuard Pro")
     st.markdown("---")
-    
+
     # This creates the actual dropdown menu in the UI
     selected_crop = st.selectbox(
-        "Target Crop System", 
-        ["Cassava", "Maize", "Potato", "Tomato"]
+        "Target Crop System", ["Cassava", "Maize", "Potato", "Tomato"]
     )
 
 # --- 4. UNIVERSAL CROP LIBRARY ---
 crop_library = {
-    "Cassava": ["Bacterial Blight (CBB)", "Brown Streak (CBSD)", "Green Mottle (CGM)", "Mosaic Disease (CMD)", "Healthy Cassava"],
+    "Cassava": [
+        "Bacterial Blight (CBB)",
+        "Brown Streak (CBSD)",
+        "Green Mottle (CGM)",
+        "Mosaic Disease (CMD)",
+        "Healthy Cassava",
+    ],
     "Maize": ["Common Rust", "Gray Leaf Spot", "Northern Leaf Blight", "Healthy Maize"],
     "Potato": ["Early Blight", "Late Blight", "Healthy Potato"],
-    "Tomato": ["Bacterial Spot", "Early Blight", "Late Blight", "Leaf Mold", "Healthy Tomato"],
+    "Tomato": [
+        "Bacterial Spot",
+        "Early Blight",
+        "Late Blight",
+        "Leaf Mold",
+        "Healthy Tomato",
+    ],
 }
 
 # --- 5. REDESIGNED INTERFACE ---
@@ -119,7 +130,9 @@ st.subheader(f"Diagnostic Suite: {selected_crop}")
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    uploaded_file = st.file_uploader("📤 Upload Leaf Specimen", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader(
+        "📤 Upload Leaf Specimen", type=["jpg", "jpeg", "png"]
+    )
 
 with col2:
     st.markdown("### Known Pathogens")
@@ -129,8 +142,12 @@ with col2:
 # --- 6. NEURAL PROCESSING ENGINE ---
 if uploaded_file is not None:
     # Show the uploaded image to the user
-    st.image(uploaded_file, caption=f"Processing {selected_crop} Specimen...", use_container_width=True)
-    
+    st.image(
+        uploaded_file,
+        caption=f"Processing {selected_crop} Specimen...",
+        use_container_width=True,
+    )
+
     with st.status("Initializing Neural Analysis...", expanded=True) as status:
         st.write("🔧 Loading specialized weights...")
         # (This is where your model.load function will eventually sit)
@@ -138,7 +155,7 @@ if uploaded_file is not None:
         st.write("📡 Cross-referencing crop library...")
         status.update(label="Analysis Complete!", state="complete", expanded=False)
 
-# --- 7. RESULTS DASHBOARD (Fixed Indentation) ---
+    # --- 7. RESULTS DASHBOARD (Fixed Indentation) ---
     st.markdown("---")
     res_col1, res_col2, res_col3 = st.columns(3)
 
@@ -289,9 +306,18 @@ from PIL import Image
 
 # 1. Global labels - KEEP THIS AT THE TOP
 labels = [
-    'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
-    'Corn___Gray_leaf_spot', 'Corn___Common_rust', 'Corn___Northern_Leaf_Blight', 'Corn___healthy',
-    'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___Late_blight', 'Tomato___healthy'
+    "Apple___Apple_scab",
+    "Apple___Black_rot",
+    "Apple___Cedar_apple_rust",
+    "Apple___healthy",
+    "Corn___Gray_leaf_spot",
+    "Corn___Common_rust",
+    "Corn___Northern_Leaf_Blight",
+    "Corn___healthy",
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___healthy",
 ]
 
 # 2. The Sidebar Block (Everything indented here stays on the left)
