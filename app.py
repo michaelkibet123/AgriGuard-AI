@@ -37,8 +37,15 @@ crop_library = {
     ],
     "Maize": ["Common Rust", "Gray Leaf Spot", "Northern Leaf Blight", "Healthy Maize"],
     "Potato": ["Early Blight", "Late Blight", "Healthy Potato"],
-    "Tomato": ["Bacterial Spot", "Early Blight", "Late Blight", "Leaf Mold", "Healthy Tomato"],
+    "Tomato": [
+        "Bacterial Spot",
+        "Early Blight",
+        "Late Blight",
+        "Leaf Mold",
+        "Healthy Tomato",
+    ],
 }
+
 
 # --------------------------------------------------
 # GOOGLE RESEARCH SCRAPER
@@ -53,6 +60,7 @@ def compile_results(disease):
         return results[0].text if results else "No research found."
     except:
         return "Offline: research servers unreachable."
+
 
 # --------------------------------------------------
 # SIDEBAR
@@ -76,6 +84,7 @@ st.divider()
 
 tab1, tab2, tab3 = st.tabs(["🔍 AI Scanner", "📖 Disease Directory", "⚙️ System Logs"])
 
+
 # ==================================================
 # LOAD MODEL
 # ==================================================
@@ -84,6 +93,7 @@ def load_model():
     model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
     return hub.KerasLayer(model_url)
 
+
 model = load_model()
 
 # ==================================================
@@ -91,9 +101,11 @@ model = load_model()
 # ==================================================
 with tab1:
     st.subheader(f"{selected_crop} Diagnostic Scanner")
-    col1, col2 = st.columns([2,1])
+    col1, col2 = st.columns([2, 1])
     with col1:
-        uploaded_file = st.file_uploader("Upload Leaf Image", type=["jpg","jpeg","png"])
+        uploaded_file = st.file_uploader(
+            "Upload Leaf Image", type=["jpg", "jpeg", "png"]
+        )
     with col2:
         st.markdown("### Known Pathogens")
         for disease in crop_library[selected_crop]:
@@ -108,8 +120,8 @@ with tab1:
             st.image(image, use_container_width=True)
         with colB:
             st.markdown("### Neural Diagnosis")
-            img = image.resize((224,224))
-            img_array = np.array(img).astype(np.float32)/255.0
+            img = image.resize((224, 224))
+            img_array = np.array(img).astype(np.float32) / 255.0
             img_array = np.expand_dims(img_array, axis=0)
             predictions = model(img_array)
             result_index = np.argmax(predictions)
@@ -164,4 +176,6 @@ with tab3:
 # FOOTER
 # --------------------------------------------------
 st.divider()
-st.caption("🌿 AgriGuard Pro v2.1 | Intelligence: TensorFlow-Hub | Environment: Streamlit Cloud")
+st.caption(
+    "🌿 AgriGuard Pro v2.1 | Intelligence: TensorFlow-Hub | Environment: Streamlit Cloud"
+)
