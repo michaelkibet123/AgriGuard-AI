@@ -369,18 +369,21 @@ HEALTHY_ADVICE = "Your crop looks healthy! Keep it that way — water correctly,
 @st.cache_resource
 def load_model():
     import tensorflow as tf
+    import os
     local_path = "agri_guard_brain.h5"
+    
     if os.path.exists(local_path):
         try:
-            model = tf.keras.models.load_model(local_path)
+            # compile=False fixes the "2 input tensors" error
+            model = tf.keras.models.load_model(local_path, compile=False)
             return model, "local"
         except Exception as e:
             st.warning(f"Local model issue: {e}. Using cloud fallback.")
+            
+    # Cloud Fallback (Generic Model)
     import tensorflow_hub as hub
     model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
     return hub.KerasLayer(model_url), "tfhub"
-
-model, model_source = load_model()
 
 
 # ─────────────────────────────────────────────────────────────
