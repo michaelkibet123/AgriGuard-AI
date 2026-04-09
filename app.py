@@ -367,6 +367,9 @@ HEALTHY_ADVICE = "Your crop looks healthy! Keep it that way — water correctly,
 # 5. AI MODEL — loads YOUR trained model first
 # ─────────────────────────────────────────────────────────────
 
+# ─────────────────────────────────────────────────────────────
+# 5. AI MODEL — loads YOUR trained model first
+# ─────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_model():
     import tensorflow as tf
@@ -375,18 +378,23 @@ def load_model():
 
     if os.path.exists(local_path):
         try:
-            # compile=False is the magic fix for the "2 input tensors" error
+            # We use compile=False and a custom loader for Keras 3 compatibility
             model = tf.keras.models.load_model(local_path, compile=False)
             return model, "local"
         except Exception as e:
-            st.warning(f"Local model issue: {e}. Using cloud fallback.")
+            st.error(f"Local model failed to load: {e}")
+            st.info("Attempting Cloud Fallback...")
 
-    # Only import hub if local fails to save memory/errors
-    import tensorflow_hub as hub
-    model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
-    return hub.KerasLayer(model_url), "tfhub"
+    # Cloud Fallback (Generic Model)
+    try:
+        import tensorflow_hub as hub
+        model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
+        return hub.KerasLayer(model_url), "tfhub"
+    except Exception as e:
+        st.error(f"Cloud fallback failed: {e}")
+        return None, "error"
 
-# This must stay outside for global access
+# Call the loader globally
 model, model_source = load_model()
 
 
