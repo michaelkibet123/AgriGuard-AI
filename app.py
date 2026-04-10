@@ -761,7 +761,7 @@ with tab_history:
             # Safe data preparation
             diag = scan.get('diagnosis', 'Unknown')
             crop = scan.get('crop', 'Crop')
-            conf = float(scan.get('confidence', 0))
+            conf = float(str(scan.get('confidence', 0)).replace('%', '').strip() or 0)
             time = str(scan.get('scanned_at', ''))[:16]
 
             st.markdown(f"""
