@@ -371,34 +371,13 @@ HEALTHY_ADVICE = "Your crop looks healthy! Keep it that way — water correctly,
 @st.cache_resource
 def load_model():
     import tensorflow as tf
-    import os
     local_path = "agri_guard_brain.h5"
-
     if os.path.exists(local_path):
         try:
-            # 1. Re-create the structure exactly as it was likely saved
-            base_model = tf.keras.applications.MobileNetV2(
-                input_shape=(224, 224, 3), 
-                include_top=False, 
-                pooling='avg' # This replaces GlobalAveragePooling2D
-            )
-            
-            # 2. Build the final model
-            # We use a Sequential model here because it's simpler for weight matching
-            model = tf.keras.Sequential([
-                base_model,
-                tf.keras.layers.Dense(5, activation='softmax')
-            ])
-
-            # 3. Load weights with 'by_name' and 'skip_mismatch'
-            # This is the secret sauce to bypass the "3 vs 2" layer error
-            model.load_weights(local_path, by_name=True, skip_mismatch=True)
+            model = tf.keras.models.load_model(local_path)
             return model, "local"
-            
         except Exception as e:
-            st.warning(f"Technical mismatch: {e}. Switching to Cloud Engine.")
-
-    # Cloud Fallback
+            st.warning(f"Could not load local model: {e}")
     import tensorflow_hub as hub
     model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
     return hub.KerasLayer(model_url), "tfhub"
