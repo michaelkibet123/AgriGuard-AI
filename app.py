@@ -375,12 +375,30 @@ def load_model():
 
     if os.path.exists(local_path):
         try:
-            # We added safe_mode=False to allow Keras 3 to load the file
-            model = tf.keras.models.load_model(local_path, compile=False, safe_mode=False)
+            # 1. Create the base architecture (Must match what you trained with)
+            base_model = tf.keras.applications.MobileNetV2(
+                input_shape=(224, 224, 3), 
+                include_top=False, 
+                weights=None # We don't need Google's weights
+            )
+            base_model.trainable = False
+
+            # 2. Rebuild your custom head
+            inputs = tf.keras.Input(shape=(224, 224, 3))
+            x = base_model(inputs, training=False)
+            x = tf.keras.layers.GlobalAveragePooling2D()(x)
+            outputs = tf.keras.layers.Dense(5, activation='softmax')(x) # Ensure '5' matches your classes
+            
+            model = tf.keras.Model(inputs, outputs)
+
+            # 3. Pour in your trained weights
+            model.load_weights(local_path)
             return model, "local"
+            
         except Exception as e:
-            st.warning(f"Local model mismatch: {e}")
-    
+            st.warning(f"Technical mismatch: {e}. Switching to Cloud Engine.")
+
+    # Cloud Fallback
     import tensorflow_hub as hub
     model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
     return hub.KerasLayer(model_url), "tfhub"
