@@ -367,9 +367,6 @@ HEALTHY_ADVICE = "Your crop looks healthy! Keep it that way — water correctly,
 # 5. AI MODEL — loads YOUR trained model first
 # ─────────────────────────────────────────────────────────────
 
-# ─────────────────────────────────────────────────────────────
-# 5. AI MODEL — loads YOUR trained model first
-# ─────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_model():
     import tensorflow as tf
@@ -378,14 +375,14 @@ def load_model():
 
     if os.path.exists(local_path):
         try:
-            # We use compile=False and a custom loader for Keras 3 compatibility
+            # compile=False is mandatory here to bypass the Keras 3 metadata conflict
             model = tf.keras.models.load_model(local_path, compile=False)
             return model, "local"
         except Exception as e:
             st.error(f"Local model failed to load: {e}")
-            st.info("Attempting Cloud Fallback...")
+            st.info("Trying cloud backup...")
 
-    # Cloud Fallback (Generic Model)
+    # Cloud Fallback logic
     try:
         import tensorflow_hub as hub
         model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
@@ -394,7 +391,6 @@ def load_model():
         st.error(f"Cloud fallback failed: {e}")
         return None, "error"
 
-# Call the loader globally
 model, model_source = load_model()
 
 
