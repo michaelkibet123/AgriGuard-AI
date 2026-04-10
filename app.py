@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
 import io
 import os
+import math
 
 # ─────────────────────────────────────────────────────────────
 # 0. PAGE CONFIG  (must be the very first Streamlit call)
