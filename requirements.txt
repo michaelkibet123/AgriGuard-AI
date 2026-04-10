@@ -4,3 +4,4 @@ setuptools==70.0.0
 streamlit
 pillow
 numpy
+beautifulsoup4
