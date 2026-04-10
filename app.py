@@ -704,7 +704,8 @@ with tab_scan:
 
                 with st.expander("See full probability breakdown"):
                     for label, prob in result["all_probs"]:
-                        st.markdown(f"`{prob:5.1f}%` {label}")
+                        p_c = float(prob) if not math.isnan(float(prob)) else 0.0
+                        st.markdown(f"`{p_c:5.1f}%` {label}")
 
                 st.divider()
                 st.markdown("**🌾 What to do:**")
