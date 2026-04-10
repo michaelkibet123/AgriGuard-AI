@@ -761,7 +761,18 @@ with tab_history:
             # Safe data preparation
             diag = scan.get('diagnosis', 'Unknown')
             crop = scan.get('crop', 'Crop')
-            conf = float(str(scan.get('confidence', 0)).replace('%', '').strip() or 0)
+            # --- START OF BULLETPROOF FIX ---
+            try:
+                # This cleans the data (removes % signs) and converts to a number
+                conf = float(str(scan.get('confidence', 0)).replace('%', '').strip() or 0)
+            except:
+                # If the data is corrupted or missing, this prevents the crash
+                conf = 0.0
+            
+            diag = str(scan.get('diagnosis', 'Unknown'))
+            crop = str(scan.get('crop', 'Crop'))
+            time = str(scan.get('scanned_at', ''))[:16]
+            # --- END OF FIX ---
             time = str(scan.get('scanned_at', ''))[:16]
 
             st.markdown(f"""
