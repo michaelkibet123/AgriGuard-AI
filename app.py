@@ -758,11 +758,17 @@ with tab_history:
             icon = "✅" if is_h else "⚠️"
             color = "#4caf50" if is_h else "#e53935"
             rec_preview = scan["recommendation"][:120] + "..." if len(scan["recommendation"]) > 120 else scan["recommendation"]
+            # Safe data preparation
+            diag = scan.get('diagnosis', 'Unknown')
+            crop = scan.get('crop', 'Crop')
+            conf = float(scan.get('confidence', 0))
+            time = str(scan.get('scanned_at', ''))[:16]
+
             st.markdown(f"""
             <div class="scan-history-item" style="border-left-color:{color};">
-                <div style="font-weight:600;">{icon} {scan['diagnosis']}</div>
+                <div style="font-weight:600;">{icon} {diag}</div>
                 <div style="font-size:0.82rem;color:#a5d6a7;">
-                    🌱 {scan['crop']} · 🎯 {scan['confidence']:.1f}% confidence · 🕐 {scan['scanned_at'][:16]}
+                    🌱 {crop} · 🎯 {conf:.1f}% confidence · 🕐 {time}
                 </div>
                 <div style="font-size:0.82rem;color:#e8f5e9;margin-top:4px;">{rec_preview}</div>
             </div>
