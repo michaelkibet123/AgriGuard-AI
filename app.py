@@ -375,21 +375,15 @@ def load_model():
 
     if os.path.exists(local_path):
         try:
-            # compile=False is mandatory here to bypass the Keras 3 metadata conflict
-            model = tf.keras.models.load_model(local_path, compile=False)
+            # We added safe_mode=False to allow Keras 3 to load the file
+            model = tf.keras.models.load_model(local_path, compile=False, safe_mode=False)
             return model, "local"
         except Exception as e:
-            st.error(f"Local model failed to load: {e}")
-            st.info("Trying cloud backup...")
-
-    # Cloud Fallback logic
-    try:
-        import tensorflow_hub as hub
-        model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
-        return hub.KerasLayer(model_url), "tfhub"
-    except Exception as e:
-        st.error(f"Cloud fallback failed: {e}")
-        return None, "error"
+            st.warning(f"Local model mismatch: {e}")
+    
+    import tensorflow_hub as hub
+    model_url = "https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2"
+    return hub.KerasLayer(model_url), "tfhub"
 
 model, model_source = load_model()
 
