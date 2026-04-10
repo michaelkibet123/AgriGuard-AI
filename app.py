@@ -287,12 +287,12 @@ CROP_LIBRARY = {
         "description": "Staple crop for millions of Kenyan families.",
     },
     "Maize": {
-        "labels": ["Common Rust", "Gray Leaf Spot", "Northern Leaf Blight", "Healthy Maize"],
+        "labels": ["Cercospora Leaf Spot", "Common Rust", "Northern Leaf Blight", "Healthy Maize"],
         "icon": "🌽",
         "description": "Kenya's most widely grown cereal crop.",
     },
     "Tomato": {
-        "labels": ["Bacterial Spot", "Early Blight", "Late Blight", "Leaf Mold", "Healthy Tomato"],
+        "labels": ["Bacterial Spot", "Early Blight", "Healthy Tomato"],
         "icon": "🍅",
         "description": "High-value horticultural crop.",
     },
@@ -458,37 +458,48 @@ def scrape_research(disease, crop):
     except Exception:
         return "You appear to be offline. Please refer to the recommendations below."
 
+MASTER_LABELS = [
+    "Cassava__Bacterial_Blight",
+    "Cassava__Brown_Streak_Disease",
+    "Cassava__Green_Mottle",
+    "Cassava__Mosaic_Disease",
+    "Cassava__Healthy",
+    "Maize__Cercospora_Leaf_Spot",
+    "Maize__Common_Rust",
+    "Maize__Northern_Leaf_Blight",
+    "Maize__Healthy",
+    "Potato__Early_Blight",
+    "Potato__Late_Blight",
+    "Potato__Healthy",
+    "Tomato__Bacterial_Spot",
+    "Tomato__Early_Blight",
+    "Tomato__Healthy",
+]
+
+CROP_INDICES = {
+    "Cassava": [0, 1, 2, 3, 4],
+    "Maize":   [5, 6, 7, 8],
+    "Potato":  [9, 10, 11],
+    "Tomato":  [12, 13, 14],
+}
+
 def run_diagnosis(image, crop):
     labels = CROP_LIBRARY[crop]["labels"]
+    indices = CROP_INDICES[crop]
     img_resized = image.resize((224, 224))
     img_array = np.array(img_resized).astype(np.float32) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
-
     preds = model(img_array)
     probs = np.array(preds).flatten()
-
-    n = len(labels)
-    # 1. Slice or pad the probabilities
-    probs_crop = probs[:n] if len(probs) >= n else np.pad(probs, (0, n - len(probs)))
-    
-    # 2. EMERGENCY CHECK: If model output is broken (all zeros or NaN)
-    if np.isnan(probs_crop).any() or probs_crop.sum() <= 0:
-        probs_crop = np.zeros(n)
-        probs_crop[-1] = 0.942  # Force the last category (usually 'Healthy') to 94.2%
-    else:
-        # 3. Normalization (Only if the model actually gave us numbers)
-        probs_crop = probs_crop / (probs_crop.sum() + 1e-9)
-
+    probs_crop = np.array([probs[i] for i in indices])
+    probs_crop = probs_crop / (probs_crop.sum() + 1e-9)
     result_index = int(np.argmax(probs_crop))
-    raw_conf = float(probs_crop[result_index])
-    confidence = raw_conf * 100 if not math.isnan(raw_conf) else 94.2
+    confidence = float(probs_crop[result_index]) * 100
     diagnosis = labels[result_index]
     is_healthy = "healthy" in diagnosis.lower()
-
     advice = HEALTHY_ADVICE if is_healthy else DISEASE_ADVICE.get(diagnosis, {}).get("action", "Consult your nearest agronomist.")
     severity = "Low" if is_healthy else DISEASE_ADVICE.get(diagnosis, {}).get("severity", "Medium")
     prevention = "" if is_healthy else DISEASE_ADVICE.get(diagnosis, {}).get("prevention", "")
-
     return {
         "diagnosis": diagnosis,
         "confidence": confidence,
@@ -499,396 +510,4 @@ def run_diagnosis(image, crop):
         "all_probs": list(zip(labels, [round(float(p)*100, 1) for p in probs_crop])),
     }
 
-
-# ─────────────────────────────────────────────────────────────
-# 7. SESSION STATE
-# ─────────────────────────────────────────────────────────────
-if "user" not in st.session_state:
-    st.session_state.user = None
-if "last_result" not in st.session_state:
-    st.session_state.last_result = None
-
-
-# ─────────────────────────────────────────────────────────────
-# 8. SIDEBAR
-# ─────────────────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown("""
-    <div style="text-align:center;padding:10px 0 4px 0;">
-        <span style="font-size:2.5rem;">🌿</span>
-        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#4caf50;font-weight:700;">AgriGuard Pro</div>
-        <div style="font-size:0.75rem;color:#81c784;">AI Plant Health for Kenya 🇰🇪</div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.divider()
-
-    if st.session_state.user:
-        u = st.session_state.user
-        st.markdown(f"**👤 {u['full_name']}**")
-        st.caption(f"📍 {u['location']}")
-        st.divider()
-
-        selected_crop = st.selectbox(
-            "🌱 Select Your Crop",
-            list(CROP_LIBRARY.keys()),
-            format_func=lambda c: f"{CROP_LIBRARY[c]['icon']} {c}"
-        )
-
-        st.divider()
-        st.markdown("**Known diseases:**")
-        for label in CROP_LIBRARY[selected_crop]["labels"]:
-            color = "#81c784" if "healthy" in label.lower() else "#ef9a9a"
-            st.markdown(f"<span style='color:{color};font-size:0.82rem;'>• {label}</span>", unsafe_allow_html=True)
-
-        st.divider()
-        if model_source == "local":
-            st.success("✅ Your trained model active")
-        else:
-            st.info("☁️ Cloud model (TFHub)")
-
-        if st.button("🚪 Sign Out"):
-            st.session_state.user = None
-            st.rerun()
-    else:
-        selected_crop = "Cassava"
-        st.info("Sign in to use AgriGuard Pro.")
-
-
-# ─────────────────────────────────────────────────────────────
-# 9. AUTH PAGE
-# ─────────────────────────────────────────────────────────────
-if not st.session_state.user:
-    st.markdown('<div class="big-title">🌿 AgriGuard Pro</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">AI-powered plant disease detection for Kenyan farmers</div>', unsafe_allow_html=True)
-    st.divider()
-
-    col_left, col_right = st.columns([1, 1])
-
-    with col_left:
-        st.markdown("### Sign In / Register")
-        mode = st.radio("", ["Login", "Create Account"], horizontal=True, label_visibility="collapsed")
-
-        if mode == "Login":
-            with st.form("login_form"):
-                uname = st.text_input("Username")
-                pwd = st.text_input("Password", type="password")
-                if st.form_submit_button("Sign In"):
-                    user = login_user(uname, pwd)
-                    if user:
-                        st.session_state.user = user
-                        st.rerun()
-                    else:
-                        st.error("Incorrect username or password.")
-        else:
-            with st.form("register_form"):
-                full_name = st.text_input("Full Name")
-                uname = st.text_input("Username")
-                pwd = st.text_input("Password", type="password")
-                location = st.selectbox("Your County / Region", [
-                    "Nairobi", "Nakuru", "Kisumu", "Meru", "Kakamega",
-                    "Eldoret", "Nyeri", "Mombasa", "Machakos", "Kisii",
-                    "Bungoma", "Embu", "Kitale", "Thika", "Other"
-                ])
-                phone = st.text_input("Phone Number (optional)")
-                if st.form_submit_button("Create Account"):
-                    if full_name and uname and pwd:
-                        ok, msg = register_user(uname, pwd, full_name, location, phone)
-                        if ok:
-                            st.success(msg + " Please sign in.")
-                        else:
-                            st.error(msg)
-                    else:
-                        st.warning("Please fill in name, username and password.")
-
-    with col_right:
-        st.markdown("""
-        <div class="card">
-            <div style="font-size:1.1rem;font-weight:700;color:#4caf50;margin-bottom:12px;">What AgriGuard Pro does</div>
-            <p>📸 <b>Scan any leaf</b> — upload a photo or use your camera</p>
-            <p>🧠 <b>AI Diagnosis</b> — trained model identifies disease instantly</p>
-            <p>🗺️ <b>Hotspot Map</b> — see where disease is spreading on the leaf</p>
-            <p>🌐 <b>Live Research</b> — pulls latest treatment info from the internet</p>
-            <p>📋 <b>Scan History</b> — all your past scans saved in one place</p>
-            <p>👨‍⚕️ <b>Vet Contacts</b> — reach a real agronomist near you</p>
-        </div>
-        <div class="card">
-            <div style="font-size:0.9rem;color:#a5d6a7;">
-                🌱 Supports: Cassava · Maize · Tomato · Potato<br>
-                📍 Built for Kenyan farmers<br>
-                🔬 Powered by a custom-trained AI model
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    st.stop()
-
-
-# ─────────────────────────────────────────────────────────────
-# 10. MAIN APP
-# ─────────────────────────────────────────────────────────────
-user = st.session_state.user
-
-st.markdown('<div class="big-title">🌿 AgriGuard Pro</div>', unsafe_allow_html=True)
-st.markdown(f'<div class="subtitle">Welcome, {user["full_name"]} · {CROP_LIBRARY[selected_crop]["description"]}</div>', unsafe_allow_html=True)
-st.divider()
-
-tab_scan, tab_history, tab_vets, tab_directory = st.tabs([
-    "🔍 Scan Leaf", "📋 My Scans", "👨‍⚕️ Find Agronomist", "📖 Disease Directory"
-])
-
-
-# ══════════════════════════════════════════════════════
-# TAB 1 — AI SCANNER
-# ══════════════════════════════════════════════════════
-with tab_scan:
-    col_upload, col_results = st.columns([1, 1], gap="large")
-
-    with col_upload:
-        st.markdown("### Upload Leaf Image")
-        input_method = st.radio("Input method", ["📁 Upload file", "📷 Use camera"],
-                                horizontal=True, label_visibility="collapsed")
-
-        uploaded_file = None
-        if input_method == "📁 Upload file":
-            uploaded_file = st.file_uploader("Drop your leaf photo here",
-                                              type=["jpg", "jpeg", "png"],
-                                              label_visibility="collapsed")
-        else:
-            camera_photo = st.camera_input("Take a photo of the leaf")
-            if camera_photo:
-                uploaded_file = camera_photo
-
-        if uploaded_file:
-            image = Image.open(uploaded_file).convert("RGB")
-            st.image(image, caption="Uploaded image", use_container_width=True)
-
-    with col_results:
-        st.markdown("### Diagnosis Results")
-
-        if uploaded_file:
-            is_leaf, green_score = is_leaf_image(image)
-
-            if not is_leaf:
-                st.markdown("""
-                <div class="card" style="border-color:#c62828;">
-                    <div style="font-size:1.2rem;font-weight:700;color:#ef9a9a;">⚠️ Not a Leaf Image</div>
-                    <p style="color:#e8f5e9;margin-top:8px;">
-                        AgriGuard could not detect a plant leaf in this photo.
-                        Please take a clear, close-up photo of a single leaf.
-                    </p>
-                    <p style="color:#a5d6a7;font-size:0.85rem;">
-                        Tips: Good lighting · Leaf fills the frame · No blurry images
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                with st.spinner("Running AI analysis..."):
-                    result = run_diagnosis(image, selected_crop)
-                    st.session_state.last_result = result
-
-                diagnosis = result["diagnosis"]
-                # --- FIXED LINE 680 ---
-                raw_c = result.get("confidence", 0)
-                try:
-                    confidence = float(raw_c) if not math.isnan(float(raw_c)) else 94.2
-                except:
-                    confidence = 94.2
-                # ----------------------
-                is_healthy = result["is_healthy"]
-                severity = result["severity"]
-
-                badge_class = "healthy-badge" if is_healthy else "disease-badge"
-                st.markdown(f'<span class="{badge_class}">{"✅ HEALTHY" if is_healthy else "⚠️ DISEASE DETECTED"}</span>', unsafe_allow_html=True)
-                st.markdown(f"**{diagnosis}**")
-
-                bar_color = "#4caf50" if is_healthy else "#e53935"
-                st.markdown(f"""
-                <div style="margin:8px 0;">
-                    <div style="font-size:0.8rem;color:#a5d6a7;">Confidence: {confidence:.1f}%</div>
-                    <div class="confidence-bar-wrap">
-                        <div style="background:{bar_color};width:{min(confidence,100):.0f}%;height:100%;border-radius:8px;"></div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-                with st.expander("See full probability breakdown"):
-                    for label, prob in result["all_probs"]:
-                        p_c = float(prob) if not math.isnan(float(prob)) else 0.0
-                        st.markdown(f"`{p_c:5.1f}%` {label}")
-
-                st.divider()
-                st.markdown("**🌾 What to do:**")
-                st.info(result["advice"])
-                if result["prevention"]:
-                    st.markdown("**🛡️ How to prevent:**")
-                    st.success(result["prevention"])
-
-                if not is_healthy:
-                    st.markdown("**🗺️ Disease Spread Hotspots:**")
-                    hotspot_img = highlight_hotspots(image, severity)
-                    st.image(hotspot_img, caption="Highlighted zones show disease spread areas", use_container_width=True)
-
-                st.divider()
-                if st.button("🌐 Get Latest Treatment Info from Internet"):
-                    with st.spinner("Searching agricultural databases..."):
-                        research = scrape_research(diagnosis, selected_crop)
-                    st.markdown("**📋 Live Research:**")
-                    st.info(research)
-                    save_scan(user["id"], selected_crop, diagnosis, confidence, result["advice"], research)
-                    st.success("✅ Scan saved to your history!")
-                elif st.button("💾 Save This Scan"):
-                    save_scan(user["id"], selected_crop, diagnosis, confidence, result["advice"], "")
-                    st.success("✅ Scan saved!")
-
-        else:
-            st.markdown("""
-            <div class="card" style="text-align:center;padding:40px 20px;">
-                <div style="font-size:3rem;">📸</div>
-                <div style="color:#81c784;font-size:1rem;margin-top:10px;">Upload a leaf photo to begin diagnosis</div>
-                <div style="color:#a5d6a7;font-size:0.82rem;margin-top:6px;">Supports JPG and PNG images</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════════════
-# TAB 2 — SCAN HISTORY
-# ══════════════════════════════════════════════════════
-with tab_history:
-    st.markdown("### Your Scan History")
-    scans = get_user_scans(user["id"])
-
-    if not scans:
-        st.info("No scans yet. Go to 'Scan Leaf' to analyse your first plant!")
-    else:
-        total = len(scans)
-        healthy_count = sum(1 for s in scans if "healthy" in s["diagnosis"].lower())
-        disease_count = total - healthy_count
-
-        m1, m2, m3 = st.columns(3)
-        with m1:
-            st.markdown(f'<div class="metric-box"><div class="metric-value">{total}</div><div class="metric-label">Total Scans</div></div>', unsafe_allow_html=True)
-        with m2:
-            st.markdown(f'<div class="metric-box"><div class="metric-value" style="color:#ef9a9a;">{disease_count}</div><div class="metric-label">Diseases Found</div></div>', unsafe_allow_html=True)
-        with m3:
-            st.markdown(f'<div class="metric-box"><div class="metric-value">{healthy_count}</div><div class="metric-label">Healthy Scans</div></div>', unsafe_allow_html=True)
-
-        st.divider()
-        for scan in scans:
-            is_h = "healthy" in scan["diagnosis"].lower()
-            icon = "✅" if is_h else "⚠️"
-            color = "#4caf50" if is_h else "#e53935"
-            rec_preview = scan["recommendation"][:120] + "..." if len(scan["recommendation"]) > 120 else scan["recommendation"]
-            # Safe data preparation
-            diag = scan.get('diagnosis', 'Unknown')
-            crop = scan.get('crop', 'Crop')
-            # --- START OF BULLETPROOF FIX ---
-            try:
-                import math
-                raw_val = str(scan.get('confidence', 0)).replace('%', '').strip()
-                conf = float(raw_val or 0)
-                if math.isnan(conf):
-                    conf = 0.0
-            except:
-                conf = 0.0
-
-            diag = str(scan.get('diagnosis', 'Unknown'))
-            crop = str(scan.get('crop', 'Crop'))
-            time = str(scan.get('scanned_at', ''))[:16]
-            time = str(scan.get('scanned_at', ''))[:16]
-
-            st.markdown(f"""
-            <div class="scan-history-item" style="border-left-color:{color};">
-                <div style="font-weight:600;">{icon} {diag}</div>
-                <div style="font-size:0.82rem;color:#a5d6a7;">
-                    🌱 {crop} · 🎯 {conf:.1f}% confidence · 🕐 {time}
-                </div>
-                <div style="font-size:0.82rem;color:#e8f5e9;margin-top:4px;">{rec_preview}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════════════
-# TAB 3 — VET CONTACTS
-# ══════════════════════════════════════════════════════
-with tab_vets:
-    st.markdown("### Find an Agronomist Near You")
-    st.caption("Call these contacts for expert advice on your farm.")
-
-    regions = ["All Regions", "Nairobi", "Kisumu", "Nakuru", "Kakamega", "Eldoret", "Nyeri", "Mombasa", "Meru"]
-    region_filter = st.selectbox("Filter by region", regions)
-    vets = get_vets(region_filter)
-
-    if not vets:
-        st.info("No contacts found for this region.")
-    else:
-        cols = st.columns(2)
-        for i, vet in enumerate(vets):
-            with cols[i % 2]:
-                st.markdown(f"""
-                <div class="vet-card">
-                    <div style="font-weight:700;color:#81c784;font-size:1rem;">👤 {vet['name']}</div>
-                    <div style="font-size:0.82rem;color:#a5d6a7;margin:4px 0;">
-                        🏷️ {vet['role']} · {vet['organisation']}
-                    </div>
-                    <div style="font-size:0.82rem;color:#e8f5e9;">
-                        📍 {vet['region']} &nbsp;|&nbsp; 🌱 {vet['speciality']}
-                    </div>
-                    <div style="margin-top:8px;">
-                        <a href="tel:{vet['phone']}" style="background:#2e7d32;color:white;padding:5px 14px;
-                        border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;">
-                            📞 {vet['phone']}
-                        </a>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-    st.divider()
-    st.markdown("**🏛️ Other helpful contacts:**")
-    st.markdown("""
-    - **KALRO Helpline:** 0800 720 715 *(free call)*
-    - **iShamba Farming Advice:** 0800 723 253
-    - **Kenya Farmers Helpline:** +254 20 2033 000
-    - **County Agriculture Office:** Contact your local county government
-    """)
-
-
-# ══════════════════════════════════════════════════════
-# TAB 4 — DISEASE DIRECTORY
-# ══════════════════════════════════════════════════════
-with tab_directory:
-    st.markdown("### Disease Field Directory")
-    st.caption("Learn to identify diseases before scanning — knowledge is your first defence.")
-
-    dir_crop = st.selectbox(
-        "Browse diseases for:",
-        list(CROP_LIBRARY.keys()),
-        format_func=lambda c: f"{CROP_LIBRARY[c]['icon']} {c}",
-        key="dir_crop_select"
-    )
-
-    for label in CROP_LIBRARY[dir_crop]["labels"]:
-        is_h = "healthy" in label.lower()
-        if is_h:
-            with st.expander(f"✅ {label}"):
-                st.success(HEALTHY_ADVICE)
-        else:
-            advice = DISEASE_ADVICE.get(label, {})
-            severity = advice.get("severity", "Unknown")
-            sev_icon = {"Very High": "🔴", "High": "🟠", "Medium": "🟡", "Low": "🟢"}.get(severity, "⚪")
-            with st.expander(f"{sev_icon} {label} — Severity: {severity}"):
-                st.markdown(f"**What to do:** {advice.get('action', 'Consult an agronomist.')}")
-                if advice.get("prevention"):
-                    st.markdown(f"**Prevention:** {advice.get('prevention')}")
-
-
-# ─────────────────────────────────────────────────────────────
-# FOOTER
-# ─────────────────────────────────────────────────────────────
-st.divider()
-st.markdown("""
-<div style="text-align:center;color:#4a7a4d;font-size:0.78rem;padding:10px 0;">
-    🌿 <b>AgriGuard Pro v3.0</b> · Developed by Michael Kibet · Kenya 🇰🇪<br>
-    AI Model: Custom-trained on Kaggle · Framework: TensorFlow + Streamlit<br>
-    Built to protect smallholder farmers across East Africa
-</div>
-""", unsafe_allow_html=True)
 
