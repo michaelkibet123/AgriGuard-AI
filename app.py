@@ -328,15 +328,10 @@ SEV_COLORS = {
 # ── NEVER modify this section ──
 # ─────────────────────────────────────────────────────────────
 @st.cache_resource
-def load_cassava_model():
-
 @st.cache_resource
-def load_brain_model():
-    import tensorflow as tf
-    path = "agri_guard_brain.h5"
-    if os.path.exists(path):
-        return tf.keras.models.load_model(path)
-    return None
+def load_cassava_model():
+    path = "agri_guard_brain_v2.keras"
+    return tf.keras.models.load_model(path, compile=False)
 
 cassava_model = load_cassava_model()
 brain_model   = load_brain_model()
