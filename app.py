@@ -4,7 +4,7 @@
 # ║                                                                  ║
 # ║  TECHNICAL SPEC (DO NOT MODIFY MODEL LOADING LOGIC):            ║
 # ║  - Cassava  → TFHub CropNet, 5 classes, loaded separately       ║
-# ║  - Others   → agri_guard_brain.h5, 38 classes, sliced by index  ║
+# ║  - Others   → agri_guard_brain_v2.keras, 38 classes, sliced by index  ║
 # ║  - Brain loaded with tf.keras.models.load_model() ONLY          ║
 # ║  - NEVER rebuild architecture, NEVER use load_weights()          ║
 # ║  - CROP_INDICES: Maize[7,8,9,10] Potato[20,21,22] Tomato[28-37] ║
@@ -335,7 +335,7 @@ def load_cassava_model():
 @st.cache_resource
 def load_brain_model():
     import tensorflow as tf
-    path = "agri_guard_brain.h5"
+    path = "agri_guard_brain_v2.keras"
     if os.path.exists(path):
         return tf.keras.models.load_model(path, compile=False)
     return None
@@ -707,7 +707,7 @@ with tab_scan:
                     st.session_state.last_result = result
 
                 if result is None:
-                    st.error("Brain model not available. Please check agri_guard_brain.h5 is in the app folder.")
+                    st.error("Brain model not available. Please check agri_guard_brain_v2.keras is in the app folder.")
                 else:
                     diagnosis  = result["diagnosis"]
                     confidence = result["confidence"]
