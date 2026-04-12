@@ -1,8 +1,10 @@
 streamlit
 numpy
 pandas
+Pillow
+setuptools
+wheel
 tensorflow
 tensorflow-hub
 scikit-learn
-pillow
 supabase
