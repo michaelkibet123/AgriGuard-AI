@@ -1,3 +1,4 @@
+import tensorflow as tf
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║              AgriGuard Pro — Final Production Build              ║
 # ║         Author: Michael Kibet | Kenya 🇰🇪 | UPenn Portfolio      ║
@@ -334,7 +335,6 @@ def load_cassava_model():
     return tf.keras.models.load_model(path, compile=False, custom_objects={}, safe_mode=False)
 
 import os
-st.write(os.path.exists("agri_guard_model.keras"))
 cassava_model = load_cassava_model()
 brain_model   = load_brain_model()
 
