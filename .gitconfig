@@ -3,3 +3,5 @@
 	name = michaelkibet123
 [safe]
 	directory = /storage/emulated/0/Documents/AgriGuardProject
+[credential]
+	helper = cache --timeout=36000
