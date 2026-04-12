@@ -1,3 +1,8 @@
+brain_ok = False
+cassava_ok = False
+brain_model = None
+cassava_model = None
+
 import tensorflow as tf
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║              AgriGuard Pro — Final Production Build              ║
