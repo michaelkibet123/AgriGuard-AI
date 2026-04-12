@@ -1,4 +1,3 @@
-brain_ok = False
 cassava_ok = False
 brain_model = None
 cassava_model = None
@@ -54,7 +53,6 @@ brain_model = load_brain_model()
 
 cassava_ok = cassava_model is not None
 
-brain_ok = brain_model is not None
 
 
 # ─────────────────────────────────────────────────────────────
@@ -647,6 +645,32 @@ if st.session_state.page == "scan_detail" and st.session_state.selected_scan:
 
 # ─────────────────────────────────────────────────────────────
 # 11. MAIN APP
+
+# ===== MODEL SAFE INIT (CRITICAL FIX) =====
+
+import tensorflow as tf
+
+import os
+
+
+
+def load_brain_model():
+
+    path = "agri_guard_brain.h5"
+
+    return tf.keras.models.load_model(path, compile=False) if os.path.exists(path) else None
+
+
+
+brain_model = load_brain_model()
+
+cassava_model = brain_model  # fallback if separate not used
+
+
+
+
+cassava_ok = cassava_model is not None
+
 # ─────────────────────────────────────────────────────────────
 st.markdown('<div class="ag-display">🌿 AgriGuard Pro</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="ag-subtitle">AI plant disease detection for Kenyan farmers · {CROP_LIBRARY[selected_crop]["icon"]} {selected_crop} selected</div>', unsafe_allow_html=True)
