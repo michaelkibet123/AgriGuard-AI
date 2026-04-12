@@ -1,5 +1,4 @@
 import tensorflow as tf
-    if os.path.exists(path):
         return tf.keras.models.load_model(path, compile=False)
     return None
 
