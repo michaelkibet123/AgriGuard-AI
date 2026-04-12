@@ -330,17 +330,6 @@ SEV_COLORS = {
 # ─────────────────────────────────────────────────────────────
 @st.cache_resource
 @st.cache_resource
-def load_cassava_model():
-    path = "agri_guard_model.keras"
-    return tf.keras.models.load_model(path, compile=False, custom_objects={}, safe_mode=False)
-
-import os
-cassava_model = load_cassava_model()
-brain_model   = load_brain_model()
-
-
-# ─────────────────────────────────────────────────────────────
-# 6. UTILITY FUNCTIONS
 # ─────────────────────────────────────────────────────────────
 def is_online():
     try:
@@ -911,4 +900,22 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+
+import tensorflow as tf
+
+
+import tensorflow as tf
+import os
+
+def load_cassava_model():
+    # Prefer .keras first (new format), fallback to .h5
+    if os.path.exists("agri_guard_model.keras"):
+        return tf.keras.models.load_model("agri_guard_model.keras", compile=False)
+    elif os.path.exists("agri_guard_brain.h5"):
+        return tf.keras.models.load_model("agri_guard_brain.h5", compile=False)
+    else:
+        raise FileNotFoundError("No model file found")
+
+cassava_model = load_cassava_model()
 
