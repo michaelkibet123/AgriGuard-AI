@@ -579,3 +579,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+def load_cassava_model():
+    path = "agri_guard_brain_v2.keras"
+    return tf.keras.models.load_model(path, compile=False)
