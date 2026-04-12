@@ -330,11 +330,11 @@ SEV_COLORS = {
 @st.cache_resource
 @st.cache_resource
 def load_cassava_model():
-    path = "agri_guard_brain_v2.keras"
+    path = "agri_guard_brain_final(1).h5"
     return tf.keras.models.load_model(path, compile=False, custom_objects={}, safe_mode=False)
 
 import os
-st.write(os.path.exists("agri_guard_brain_v2.keras"))
+st.write(os.path.exists("agri_guard_brain_final(1).h5"))
 cassava_model = load_cassava_model()
 brain_model   = load_brain_model()
 
