@@ -337,7 +337,7 @@ def load_brain_model():
     import tensorflow as tf
     path = "agri_guard_brain.h5"
     if os.path.exists(path):
-        return tf.keras.models.load_model(path)
+        return tf.keras.models.load_model(path, compile=False)
     return None
 
 cassava_model = load_cassava_model()
