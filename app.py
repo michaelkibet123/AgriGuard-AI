@@ -329,7 +329,7 @@ SEV_COLORS = {
 # ─────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_cassava_model():
-    return hub.KerasLayer("https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2")
+    return tf.keras.models.load_model("agri_guard_brain_v2.keras")
 
 @st.cache_resource
 def load_brain_model():
