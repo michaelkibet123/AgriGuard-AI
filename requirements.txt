@@ -8,3 +8,4 @@ tensorflow
 tensorflow-hub
 scikit-learn
 supabase
+tensorflow==2.15.0
