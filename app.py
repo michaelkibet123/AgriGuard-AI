@@ -329,7 +329,6 @@ SEV_COLORS = {
 # ─────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_cassava_model():
-    import tensorflow_hub as hub
     return hub.KerasLayer("https://tfhub.dev/google/cropnet/classifier/cassava_disease_V1/2")
 
 @st.cache_resource
