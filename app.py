@@ -1,6 +1,4 @@
 import tensorflow as tf
-        return tf.keras.models.load_model(path, compile=False)
-    return None
 
 
 
