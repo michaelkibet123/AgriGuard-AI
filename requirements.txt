@@ -1,5 +1,5 @@
 streamlit>=1.32.0
-tensorflow-cpu
+tensorflow-cpu==2.15.0
 tensorflow-hub
 setuptools==81.0.0
 Pillow>=9.0.0
