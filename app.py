@@ -455,7 +455,6 @@ with st.sidebar:
 
     st.markdown("<hr style='border-color:rgba(34,197,94,0.15);margin:16px 0;'>", unsafe_allow_html=True)
 
-    brain_ok = brain_model is not None
     st.markdown(f"""
     <div style="font-size:0.75rem;padding:0 2px;">
         <div style="margin-bottom:6px;">✅ <span style="color:#86efac;">CropNet (Cassava)</span></div>
@@ -930,4 +929,9 @@ def load_brain_model():
     return None
 
 brain_model = load_brain_model()
+
+
+# SAFE MODEL STATUS CHECK (must be after loaders)
+brain_ok = brain_model is not None
+cassava_ok = cassava_model is not None
 
