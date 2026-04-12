@@ -264,9 +264,9 @@ def get_vets(region=None):
 # 4. CROP & DISEASE DATA
 # ─────────────────────────────────────────────────────────────
 CROP_INDICES = {
-    "Maize":  [7, 8, 9, 10],
-    "Potato": [20, 21, 22],
-    "Tomato": [28, 29, 30, 31, 32, 33, 34, 35, 36, 37],
+    "Maize":  [0, 1, 2, 3],
+    "Potato": [4, 5, 6],
+    "Tomato": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
 }
 
 CROP_LIBRARY = {
@@ -277,12 +277,12 @@ CROP_LIBRARY = {
     },
     "Maize": {
         "icon": "🌽",
-        "labels": ["Cercospora Leaf Spot","Common Rust","Northern Leaf Blight","Healthy"],
+        "labels": ["Cercospora Leaf Spot","Common Rust","Healthy","Northern Leaf Blight"],
         "model": "brain",
     },
     "Potato": {
         "icon": "🥔",
-        "labels": ["Early Blight","Late Blight","Healthy"],
+        "labels": ["Early Blight","Healthy","Late Blight"],
         "model": "brain",
     },
     "Tomato": {
