@@ -23,6 +23,35 @@ from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageEnhance
 import random
 
+# ───────── MODEL INIT (SAFE ORDER) ─────────
+
+def load_cassava_model():
+
+    path = "agri_guard_brain.h5"
+
+    return tf.keras.models.load_model(path, compile=False) if os.path.exists(path) else None
+
+
+
+def load_brain_model():
+
+    path = "agri_guard_brain.h5"
+
+    return tf.keras.models.load_model(path, compile=False) if os.path.exists(path) else None
+
+
+
+cassava_model = load_cassava_model()
+
+brain_model = load_brain_model()
+
+
+
+cassava_ok = cassava_model is not None
+
+brain_ok = brain_model is not None
+
+
 # ─────────────────────────────────────────────────────────────
 # 0. PAGE CONFIG
 # ─────────────────────────────────────────────────────────────
@@ -458,7 +487,6 @@ with st.sidebar:
     st.markdown(f"""
     <div style="font-size:0.75rem;padding:0 2px;">
         <div style="margin-bottom:6px;">✅ <span style="color:#86efac;">CropNet (Cassava)</span></div>
-        <div>{'✅' if brain_ok else '⚠️'} <span style="color:#86efac;">Brain Model (Maize/Potato/Tomato)</span></div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -932,6 +960,5 @@ brain_model = load_brain_model()
 
 
 # SAFE MODEL STATUS CHECK (must be after loaders)
-brain_ok = brain_model is not None
 cassava_ok = cassava_model is not None
 
