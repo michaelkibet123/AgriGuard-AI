@@ -919,3 +919,15 @@ def load_cassava_model():
 
 cassava_model = load_cassava_model()
 
+
+import tensorflow as tf
+import os
+
+def load_brain_model():
+    path = "agri_guard_brain.h5"
+    if os.path.exists(path):
+        return tf.keras.models.load_model(path, compile=False)
+    return None
+
+brain_model = load_brain_model()
+
